@@ -28,7 +28,7 @@ count.style.cssText = "display:flex; justify-content:space-evenly;"
 tasksCount.style.cssText = "display:flex;"
 completedCount.style.cssText = "display:flex;"
 tasksCircle.style.cssText = "max-width:10px; max-height:10px; padding:10px; box-sizing:border-box; border-radius:50%; background-color:red; color:white; display:flex; justify-content:center; align-items:center; margin-left:5px"
-completedCircle.style.cssText = "max-width:10px; max-height:10px; padding:10px; box-sizing:border-box; border-radius:50%; background-color:red; color:white; display:flex; justify-content:center; align-items:center; margin-left:5px"
+completedCircle.style.cssText = "max-width:10px; max-height:10px; padding:10px; box-sizing:border-box; border-radius:50%; background-color:green; color:white; display:flex; justify-content:center; align-items:center; margin-left:5px"
 tasksCountTxt.style.cssText = "color: gray;"
 compCountTxt.style.cssText = "color: gray;"
 // new Task css style
