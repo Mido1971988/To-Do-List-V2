@@ -39,7 +39,10 @@ let editStyle = "padding:5px; background-color:red; color:white; border-radius:5
 let deleteStyle = "background-color:red; color:white; border-radius:50%; cursor:pointer; border:none; position:absolute; right:0; top:0; transform:translate(50%, -50%); width:20px; height:20px; text-align:center; box-sizing:border-box;"
 // completed button css style
 let compeleteStyle = "padding:5px; background-color:grey; color:white; border-radius:5px; cursor:pointer; border:none; width:90%; font-size:12px; max-height:25px; text-align:center; box-sizing:border-box;"
-
+// up css style
+let upStyle = "cursor:pointer; width:0; height:0; border-left:10px solid transparent; border-right:10px solid transparent; border-bottom:10px solid grey; position:absolute; left:0; top:0; transform:translate(-100%, -50%); text-align:center; box-sizing:border-box;"
+// down css style
+let downStyle = "cursor:pointer; width:0; height:0; border-right:10px solid transparent; border-left:10px solid transparent; border-top:10px solid grey; position:absolute; right:100%; top:100%; transform:translate(0%, -50%); text-align:center; box-sizing:border-box;"
 // JS
 
 
@@ -50,30 +53,11 @@ let completedBtn;
 let editBtn;
 let idCount;
 let arrOfTasks = JSON.parse(window.localStorage.getItem("ToDoList"));
+let up;
+let down;
 
-
-if(arrOfTasks && arrOfTasks.length > 0){
-    idCount = +Object.keys(arrOfTasks[arrOfTasks.length-1]).join("").match(/\d/ig).join("")
-    for ( let oneTask of arrOfTasks){
-        createEls()
-        let taskId = Object.keys(oneTask).join("").match(/ID-\d+/ig).join("")
-        task.setAttribute("id", taskId)
-        let tasktxtNode = oneTask[taskId]
-        task.prepend(tasktxtNode)
-        if (oneTask["status"] === "completed"){
-            completedBtn = document.querySelector(`#${taskId} .done`)
-            completedBtn.style.backgroundColor = "green"
-            completedBtn.textContent = "Completed"
-            completedBtn.classList.remove("pending")
-            completedBtn.classList.add("completed")
-            noOfCompleted()
-        }
-    }
-}else {
-    arrOfTasks = []
-    idCount = 0;
-    noTaskToShow();
-}
+restoreTasks()
+// Add a New Task
 add.addEventListener("click", function(e){
     if(input.value !== "") {
         idCount++ 
@@ -159,9 +143,56 @@ document.addEventListener("click", function(e){
         }
     }
 })
+//  Move Task Up
+document.addEventListener("click" , function(e) {
+    if (e.target.className === "up") {
+        for ( let oneTask of arrOfTasks) {
+            if(oneTask[e.target.parentNode.id]){
+                moveUp(arrOfTasks.indexOf(oneTask))
+                break;
+            }
+        }
+    }
+})
+// Move Task Down
+document.addEventListener("click" , function(e) {
+    if (e.target.className === "down") {
+        for ( let oneTask of arrOfTasks) {
+            if(oneTask[e.target.parentNode.id]){
+                moveDown(arrOfTasks.indexOf(oneTask))
+                break;
+            }
+        }
+    }
+})
 
 
 // Functions 
+
+function restoreTasks() {
+    if(arrOfTasks && arrOfTasks.length > 0){
+        idCount = +Object.keys(arrOfTasks[arrOfTasks.length-1]).join("").match(/\d/ig).join("")
+        for ( let oneTask of arrOfTasks){
+            createEls()
+            let taskId = Object.keys(oneTask).join("").match(/ID-\d+/ig).join("")
+            task.setAttribute("id", taskId)
+            let tasktxtNode = oneTask[taskId]
+            task.prepend(tasktxtNode)
+            if (oneTask["status"] === "completed"){
+                completedBtn = document.querySelector(`#${taskId} .done`)
+                completedBtn.style.backgroundColor = "green"
+                completedBtn.textContent = "Completed"
+                completedBtn.classList.remove("pending")
+                completedBtn.classList.add("completed")
+                noOfCompleted()
+            }
+        }
+    }else {
+        arrOfTasks = []
+        idCount = 0;
+        noTaskToShow();
+    }
+}
 
 function noTaskToShow() {
     if(tasks.childElementCount == 0) {
@@ -180,10 +211,14 @@ function createEls() {
     editBtn = document.createElement("div")
     deleteBtn = document.createElement("div")
     completedBtn = document.createElement("div")
+    up = document.createElement("div")
+    down = document.createElement("div")
     task.style.cssText = taskStyle
     editBtn.style.cssText = editStyle
     deleteBtn.style.cssText = deleteStyle
     completedBtn.style.cssText = compeleteStyle
+    up.style.cssText = upStyle
+    down.style.cssText = downStyle
     editBtn.textContent = "Edit"
     deleteBtn.textContent = "x"
     completedBtn.textContent = "Pending"
@@ -192,7 +227,9 @@ function createEls() {
     deleteBtn.setAttribute("class", "delete")
     completedBtn.setAttribute("class", "done")
     completedBtn.classList.add("pending")
-    task.append(completedBtn ,editBtn ,deleteBtn)
+    up.setAttribute("class", "up")
+    down.setAttribute("class", "down")
+    task.append(completedBtn ,editBtn ,deleteBtn,up,down)
     tasks.prepend(task)
     noOfTasks()
     if (document.body.contains(document.querySelector(".noTask"))) {
@@ -211,3 +248,29 @@ function noOfCompleted() {
     let num = document.querySelectorAll(".completed").length
     completedCircle.innerHTML = num
 }
+
+
+
+function moveUp(taskIndex) {
+    if(taskIndex !== arrOfTasks.length -1) {
+        let movingTask = arrOfTasks.splice(taskIndex,1)
+        arrOfTasks.splice(taskIndex + 1 ,0,...movingTask)
+        window.localStorage.setItem( "ToDoList" , JSON.stringify(arrOfTasks))
+        tasks.innerHTML = ""
+        restoreTasks()
+    }
+}
+
+function moveDown(taskIndex) {
+    if(taskIndex !== 0){
+        let movingTask = arrOfTasks.splice(taskIndex,1)
+        arrOfTasks.splice(taskIndex - 1 ,0,...movingTask)
+        window.localStorage.setItem( "ToDoList" , JSON.stringify(arrOfTasks))
+        tasks.innerHTML = ""
+        restoreTasks()
+    }
+}
+
+
+
+// moveUp(+e.target.parentNode.id.match(/\d/ig).join("") - 1)
