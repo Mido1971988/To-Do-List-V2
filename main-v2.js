@@ -171,7 +171,7 @@ document.addEventListener("click" , function(e) {
 
 function restoreTasks() {
     if(arrOfTasks && arrOfTasks.length > 0){
-        idCount = +Object.keys(arrOfTasks[arrOfTasks.length-1]).join("").match(/\d/ig).join("")
+        idCount = +Object.keys(arrOfTasks[arrOfTasks.length-1]).join("").match(/\d+/ig).join("")
         for ( let oneTask of arrOfTasks){
             createEls()
             let taskId = Object.keys(oneTask).join("").match(/ID-\d+/ig).join("")
@@ -271,6 +271,4 @@ function moveDown(taskIndex) {
     }
 }
 
-
-
-// moveUp(+e.target.parentNode.id.match(/\d/ig).join("") - 1)
+window.localStorage.removeItem("ToDoList")
