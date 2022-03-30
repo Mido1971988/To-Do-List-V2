@@ -270,5 +270,3 @@ function moveDown(taskIndex) {
         restoreTasks()
     }
 }
-
-window.localStorage.removeItem("ToDoList")
