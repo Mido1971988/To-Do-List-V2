@@ -10,6 +10,9 @@ let tasksCircle = document.querySelector(".tasksCircle")
 let completedCircle = document.querySelector(".completedCircle")
 let tasksCountTxt = document.querySelector(".tasksCountTxt")
 let compCountTxt = document.querySelector(".compCountTxt")
+let all = document.querySelector(".all")
+let deleteAllBtn = document.querySelector(".clear")
+let completeAllBtn = document.querySelector(".compAll")
 
 // Header
 let head = document.createElement("h1")
@@ -23,6 +26,9 @@ form.style.cssText = "display:flex; align-items:center; justify-content:center"
 input.style.cssText = "width:50%; padding:10px; border:none; border-radius:5px; outline:none;"
 add.style.cssText = "background-color:red; color:white; border-radius:5px; height:30px; width:100px; margin-left:20px; cursor:pointer; display:flex; align-items:center; justify-content:center;"
 tasks.style.cssText = "background-color:#eee; position:absolute; top:100px; width:100%; left:0; padding:20px; box-sizing:border-box; border-radius:5px; display:grid; gap:20px; "
+all.style.cssText = "display:flex; justify-content:space-evenly; margin-top:20px; margin-bottom:-20px"
+deleteAllBtn.style.cssText = "background-color:red; color:white; padding:5px; border-radius:5px; cursor:pointer;"
+completeAllBtn.style.cssText = "background-color:green; color:white; padding:5px; border-radius:5px; cursor:pointer;"
 // count of Tasks css style
 count.style.cssText = "display:flex; justify-content:space-evenly;"
 tasksCount.style.cssText = "display:flex;"
@@ -161,6 +167,41 @@ document.addEventListener("click" , function(e) {
             if(oneTask[e.target.parentNode.id]){
                 moveDown(arrOfTasks.indexOf(oneTask))
                 break;
+            }
+        }
+    }
+})
+
+// Delete All
+deleteAllBtn.addEventListener("click" , function (){
+    if(arrOfTasks.length > 0){
+        if(confirm("Delete All Tasks !!!!!")){
+            tasks.innerHTML = ""
+            noTaskToShow();
+            window.localStorage.clear()
+            noOfTasks()
+            noOfCompleted()
+        }
+    }
+})
+
+// Mark All Completed
+completeAllBtn.addEventListener("click", function(){
+    if(arrOfTasks.length > 0) {
+        if(confirm("Complete All Tasks !!!!!!")) {
+            let arrTasks = Array.from(tasks.childNodes)
+            for(let task of arrTasks){
+                task.firstElementChild.style.backgroundColor = "green"
+                task.firstElementChild.textContent = "Completed"
+                task.firstElementChild.classList.remove("pending")
+                task.firstElementChild.classList.add("completed")
+                noOfCompleted()
+                for (let oneTask of arrOfTasks){
+                    if (oneTask.hasOwnProperty(task.id)){
+                        oneTask["status"] = "completed"
+                        window.localStorage.setItem( "ToDoList" , JSON.stringify(arrOfTasks))
+                    }
+                }
             }
         }
     }
