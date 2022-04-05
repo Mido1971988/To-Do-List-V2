@@ -50,8 +50,8 @@ let upStyle = "cursor:pointer; width:0; height:0; border-left:10px solid transpa
 // down css style
 let downStyle = "cursor:pointer; width:0; height:0; border-right:10px solid transparent; border-left:10px solid transparent; border-top:10px solid grey; position:absolute; right:100%; top:100%; transform:translate(0%, -50%); text-align:center; box-sizing:border-box;"
 let newTagStyle = "background-color:green; color:white; min-width:fit-content; border-radius:5px; padding:2px; position:absolute; left:-20px; top:50%; font-size:10px; transform:translate(0,-50%)"
+let loadingStyle = "background-color:rgb(236,236,236,0.7); border-radius:10px; width:200px; height:50px; display:flex; justify-content:center; align-items:center; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); "
 // JS
-
 
 // declare varaibles
 let task;
@@ -63,24 +63,29 @@ let arrOfTasks = JSON.parse(window.localStorage.getItem("ToDoList"));
 let up;
 let down;
 let newTag;
+let loading;
 
 restoreTasks()
 // Add a New Task
 add.addEventListener("click", function(e){
     if(input.value !== "") {
-        idCount++ 
-        let taskObj = {
-            [`ID-${idCount}`] : input.value ,
-            status : "Pending"
-        }
-        arrOfTasks.push(taskObj)
-        window.localStorage.setItem( "ToDoList" , JSON.stringify(arrOfTasks))
-        createEls()
-        newTagFunc()
-        task.setAttribute("id",`ID-${idCount}`)
-        let tasktxtNode = input.value
-        task.prepend(tasktxtNode)
-        input.value = ""
+        loadingFunc()
+        window.setTimeout(_=> {
+            idCount++ 
+            let taskObj = {
+                [`ID-${idCount}`] : input.value ,
+                status : "Pending"
+            }
+            arrOfTasks.push(taskObj)
+            window.localStorage.setItem( "ToDoList" , JSON.stringify(arrOfTasks))
+            createEls()
+            newTagFunc()
+            task.setAttribute("id",`ID-${idCount}`)
+            let tasktxtNode = input.value
+            task.prepend(tasktxtNode)
+            input.value = ""
+            loading.remove()
+        },2000)
     }
 })
 
@@ -321,3 +326,12 @@ function newTagFunc() {
     newTag.textContent = "New"
     task.appendChild(newTag)
 }
+
+
+function loadingFunc() {
+    loading = document.createElement("div")
+    loading.textContent = "Adding a new Task . . ."
+    loading.style.cssText = loadingStyle
+    document.body.appendChild(loading)
+}
+
