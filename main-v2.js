@@ -85,7 +85,7 @@ add.addEventListener("click", function(e){
             task.prepend(tasktxtNode)
             input.value = ""
             loading.remove()
-        },2000)
+        },500)
     }
 })
 
