@@ -49,6 +49,7 @@ let compeleteStyle = "padding:5px; background-color:grey; color:white; border-ra
 let upStyle = "cursor:pointer; width:0; height:0; border-left:10px solid transparent; border-right:10px solid transparent; border-bottom:10px solid grey; position:absolute; left:0; top:0; transform:translate(-100%, -50%); text-align:center; box-sizing:border-box;"
 // down css style
 let downStyle = "cursor:pointer; width:0; height:0; border-right:10px solid transparent; border-left:10px solid transparent; border-top:10px solid grey; position:absolute; right:100%; top:100%; transform:translate(0%, -50%); text-align:center; box-sizing:border-box;"
+let newTagStyle = "background-color:green; color:white; min-width:fit-content; border-radius:5px; padding:2px; position:absolute; left:-20px; top:50%; font-size:10px; transform:translate(0,-50%)"
 // JS
 
 
@@ -61,6 +62,7 @@ let idCount;
 let arrOfTasks = JSON.parse(window.localStorage.getItem("ToDoList"));
 let up;
 let down;
+let newTag;
 
 restoreTasks()
 // Add a New Task
@@ -74,6 +76,7 @@ add.addEventListener("click", function(e){
         arrOfTasks.push(taskObj)
         window.localStorage.setItem( "ToDoList" , JSON.stringify(arrOfTasks))
         createEls()
+        newTagFunc()
         task.setAttribute("id",`ID-${idCount}`)
         let tasktxtNode = input.value
         task.prepend(tasktxtNode)
@@ -310,4 +313,11 @@ function moveDown(taskIndex) {
         tasks.innerHTML = ""
         restoreTasks()
     }
+}
+
+function newTagFunc() {
+    newTag = document.createElement("div")
+    newTag.style.cssText = newTagStyle
+    newTag.textContent = "New"
+    task.appendChild(newTag)
 }
