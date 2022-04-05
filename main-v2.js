@@ -58,6 +58,7 @@ let task;
 let deleteBtn;
 let completedBtn;
 let editBtn;
+let idNumsArr = [];
 let idCount;
 let arrOfTasks = JSON.parse(window.localStorage.getItem("ToDoList"));
 let up;
@@ -72,6 +73,7 @@ add.addEventListener("click", function(e){
         loadingFunc()
         window.setTimeout(_=> {
             idCount++ 
+            console.log(idCount)
             let taskObj = {
                 [`ID-${idCount}`] : input.value ,
                 status : "Pending"
@@ -151,6 +153,9 @@ document.addEventListener("click", function(e){
                     window.localStorage.setItem( "ToDoList" , JSON.stringify(arrOfTasks))
                 }
             }
+            if(arrOfTasks.length === 0){
+                idCount = 0;
+            }
             noTaskToShow()
             noOfTasks()
             noOfCompleted()
@@ -187,6 +192,8 @@ deleteAllBtn.addEventListener("click" , function (){
             tasks.innerHTML = ""
             noTaskToShow();
             window.localStorage.clear()
+            arrOfTasks = []
+            idCount = 0
             noOfTasks()
             noOfCompleted()
         }
@@ -220,8 +227,9 @@ completeAllBtn.addEventListener("click", function(){
 
 function restoreTasks() {
     if(arrOfTasks && arrOfTasks.length > 0){
-        idCount = +Object.keys(arrOfTasks[arrOfTasks.length-1]).join("").match(/\d+/ig).join("")
         for ( let oneTask of arrOfTasks){
+            let oneTaskIdNum = +Object.keys(oneTask)[0].match(/\d+/ig).join("")
+            idNumsArr.push(oneTaskIdNum)
             createEls()
             let taskId = Object.keys(oneTask).join("").match(/ID-\d+/ig).join("")
             task.setAttribute("id", taskId)
@@ -235,6 +243,7 @@ function restoreTasks() {
                 completedBtn.classList.add("completed")
                 noOfCompleted()
             }
+            idCount = Math.max(...idNumsArr)
         }
     }else {
         arrOfTasks = []
