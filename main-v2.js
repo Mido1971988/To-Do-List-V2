@@ -49,7 +49,7 @@ let compeleteStyle = "padding:5px; background-color:grey; color:white; border-ra
 let upStyle = "cursor:pointer; width:0; height:0; border-left:10px solid transparent; border-right:10px solid transparent; border-bottom:10px solid grey; position:absolute; left:0; top:0; transform:translate(-100%, -50%); text-align:center; box-sizing:border-box;"
 // down css style
 let downStyle = "cursor:pointer; width:0; height:0; border-right:10px solid transparent; border-left:10px solid transparent; border-top:10px solid grey; position:absolute; right:100%; top:100%; transform:translate(0%, -50%); text-align:center; box-sizing:border-box;"
-let newTagStyle = "background-color:green; color:white; min-width:fit-content; border-radius:5px; padding:2px; position:absolute; left:-20px; top:50%; font-size:10px; transform:translate(0,-50%)"
+let moveStyle = " cursor:pointer; background-color:green; color:white; width:20px; border-radius:5px; padding:2px; position:absolute; left:-10px; top:50%; font-size:14px; transform:translate(-50%,-50%); height:100%; writing-mode:vertical-lr; text-align:center;"
 let loadingStyle = "background-color:rgb(236,236,236,0.7); border-radius:10px; width:200px; height:50px; display:flex; justify-content:center; align-items:center; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); "
 // JS
 
@@ -63,7 +63,7 @@ let idCount;
 let arrOfTasks = JSON.parse(window.localStorage.getItem("ToDoList"));
 let up;
 let down;
-let newTag;
+let move;
 let loading;
 
 restoreTasks()
@@ -73,7 +73,6 @@ add.addEventListener("click", function(e){
         loadingFunc()
         window.setTimeout(_=> {
             idCount++ 
-            console.log(idCount)
             let taskObj = {
                 [`ID-${idCount}`] : input.value ,
                 status : "Pending"
@@ -81,7 +80,6 @@ add.addEventListener("click", function(e){
             arrOfTasks.push(taskObj)
             window.localStorage.setItem( "ToDoList" , JSON.stringify(arrOfTasks))
             createEls()
-            newTagFunc()
             task.setAttribute("id",`ID-${idCount}`)
             let tasktxtNode = input.value
             task.prepend(tasktxtNode)
@@ -162,6 +160,15 @@ document.addEventListener("click", function(e){
         }
     }
 })
+
+// Create arrow for up and down
+document.addEventListener("click", function(e){
+    if(e.target.className === "move") {
+        upAndDown(e.target.parentNode)
+        e.target.remove()
+    }
+})
+
 //  Move Task Up
 document.addEventListener("click" , function(e) {
     if (e.target.className === "up") {
@@ -269,25 +276,23 @@ function createEls() {
     editBtn = document.createElement("div")
     deleteBtn = document.createElement("div")
     completedBtn = document.createElement("div")
-    up = document.createElement("div")
-    down = document.createElement("div")
+    move = document.createElement("div")
     task.style.cssText = taskStyle
     editBtn.style.cssText = editStyle
     deleteBtn.style.cssText = deleteStyle
     completedBtn.style.cssText = compeleteStyle
-    up.style.cssText = upStyle
-    down.style.cssText = downStyle
+    move.style.cssText = moveStyle
     editBtn.textContent = "Edit"
     deleteBtn.textContent = "x"
     completedBtn.textContent = "Pending"
+    move.textContent = "Move"
     task.setAttribute("class","task")
     editBtn.setAttribute("class","edit")
     deleteBtn.setAttribute("class", "delete")
     completedBtn.setAttribute("class", "done")
+    move.setAttribute("class", "move")
     completedBtn.classList.add("pending")
-    up.setAttribute("class", "up")
-    down.setAttribute("class", "down")
-    task.append(completedBtn ,editBtn ,deleteBtn,up,down)
+    task.append(completedBtn ,editBtn ,deleteBtn, move)
     tasks.prepend(task)
     noOfTasks()
     if (document.body.contains(document.querySelector(".noTask"))) {
@@ -329,18 +334,21 @@ function moveDown(taskIndex) {
     }
 }
 
-function newTagFunc() {
-    newTag = document.createElement("div")
-    newTag.style.cssText = newTagStyle
-    newTag.textContent = "New"
-    task.appendChild(newTag)
-}
-
 
 function loadingFunc() {
     loading = document.createElement("div")
     loading.textContent = "Adding a new Task . . ."
     loading.style.cssText = loadingStyle
     document.body.appendChild(loading)
+}
+
+function upAndDown(taskToMove) {
+    up = document.createElement("div")
+    down = document.createElement("div")
+    up.style.cssText = upStyle
+    down.style.cssText = downStyle
+    up.setAttribute("class", "up")
+    down.setAttribute("class", "down")
+    taskToMove.append(up,down)
 }
 
