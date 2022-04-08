@@ -86,28 +86,30 @@ let detailsSheet;
 restoreTasks();
 // Add a New Task
 add.addEventListener("click", function (e) {
-    if (input.value !== "") {
-        loadingFunc();
-        window.setTimeout((_) => {
-        idCount++;
-        let time = new Date();
-        let taskObj = {
-            [`ID-${idCount}`]: input.value,
-            status: "Pending",
-            timeRecord: time
-            .toString()
-            .match(/\w+ \d+ \d+ \d+:\d+:\d+/gi)
-            .join(""),
-        };
-        arrOfTasks.push(taskObj);
-        window.localStorage.setItem("ToDoList", JSON.stringify(arrOfTasks));
-        createEls();
-        task.setAttribute("id", `ID-${idCount}`);
-        let tasktxtNode = input.value;
-        task.prepend(tasktxtNode);
-        input.value = "";
-        loading.remove();
-        }, 500);
+    if(select.textContent === "Select"){
+        if (input.value !== "") {
+            loadingFunc();
+            window.setTimeout((_) => {
+            idCount++;
+            let time = new Date();
+            let taskObj = {
+                [`ID-${idCount}`]: input.value,
+                status: "Pending",
+                timeRecord: time
+                .toString()
+                .match(/\w+ \d+ \d+ \d+:\d+:\d+/gi)
+                .join(""),
+            };
+            arrOfTasks.push(taskObj);
+            window.localStorage.setItem("ToDoList", JSON.stringify(arrOfTasks));
+            createEls();
+            task.setAttribute("id", `ID-${idCount}`);
+            let tasktxtNode = input.value;
+            task.prepend(tasktxtNode);
+            input.value = "";
+            loading.remove();
+            }, 500);
+        }
     }
 });
 
@@ -261,8 +263,10 @@ document.addEventListener("click", function (e) {
     if (e.target.className === "deleteSelected" && selectedFragment.childNodes.length > 0) {
         for (let selected of selectedFragment.childNodes) {
             for (let originalTask of tasks.childNodes) {
+                console.log(selectedFragment)
                 if (originalTask.id === selected.id) {
                 deleteElement(originalTask);
+                selectedFragment.removeChild(selected);
                 }
             }
         }
