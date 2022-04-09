@@ -80,7 +80,7 @@ let up;
 let down;
 let selectCircle;
 let loading;
-let selectedFragment = new DocumentFragment();
+let selectedArray= [];
 let detailsSheet;
 
 restoreTasks();
@@ -185,7 +185,7 @@ document.addEventListener("click", function (e) {
             tasks.childNodes.forEach((el) => {
                 SelectCircle(el);
             });
-        } else if (select.textContent === "Selecting" && showDetails.innerHTML === "Details" && selectedFragment.childNodes.length === 0) {
+        } else if (select.textContent === "Selecting" && showDetails.innerHTML === "Details" && selectedArray.length === 0) {
             select.textContent = "Select";
             deleteSelected.style.visibility = "hidden";
             showDetails.style.visibility = "hidden";
@@ -204,20 +204,20 @@ document.addEventListener("click", function (e) {
     if (e.target.style.backgroundColor === "white" && e.target.className === "circle") {
         e.target.style.backgroundColor = "green";
         e.target.style.border = "none";
-        let selectedNode = e.target.parentNode.cloneNode();
-        for (let selected of selectedFragment.childNodes) {
+        let selectedNode = e.target.parentNode;
+        for (let selected of selectedArray) {
             if (selected.id === selectedNode.id) {
-                selectedFragment.removeChild(selected);
+                selectedArray.splice(selectedArray.indexOf(selected), 1);
             }
         }
-        selectedFragment.append(selectedNode);
+        selectedArray.push(selectedNode);
     } else if (e.target.style.backgroundColor === "green" && e.target.className === "circle") {
         e.target.style.backgroundColor = "white";
         e.target.style.border = "1px solid black";
         let deletedNode = e.target.parentNode;
-        for (let selected of selectedFragment.childNodes) {
+        for (let selected of selectedArray) {
             if (selected.id === deletedNode.id) {
-                selectedFragment.removeChild(selected);
+                selectedArray.splice(selectedArray.indexOf(selected), 1);
             }
         }
     }
@@ -225,11 +225,11 @@ document.addEventListener("click", function (e) {
 
 // click on Details Button to show details of selected tasks
 showDetails.addEventListener("click", function (e) {
-    if (e.target.style.backgroundColor === "green" && selectedFragment.childNodes.length > 0) {
+    if (e.target.style.backgroundColor === "green" && selectedArray.length > 0) {
         e.target.style.backgroundColor = "red";
         e.target.innerHTML = "Displaying"
         if (arrOfTasks && arrOfTasks.length > 0) {
-        for (let selected of selectedFragment.childNodes) {
+        for (let selected of selectedArray) {
             for (let originalTask of tasks.childNodes) {
             if (originalTask.id === selected.id) {
                 let selectedDetails = document.querySelector(
@@ -260,13 +260,14 @@ showDetails.addEventListener("click", function (e) {
 
 // click on delete btn to delete selected tasks
 document.addEventListener("click", function (e) {
-    if (e.target.className === "deleteSelected" && selectedFragment.childNodes.length > 0) {
-        for (let selected of selectedFragment.childNodes) {
-            for (let originalTask of tasks.childNodes) {
-                console.log(selectedFragment)
-                if (originalTask.id === selected.id) {
-                deleteElement(originalTask);
-                selectedFragment.removeChild(selected);
+    if (e.target.className === "deleteSelected" && selectedArray.length > 0) {
+        let originalNodes = Array.from(tasks.childNodes)
+        let selectedArrayFixed = Array.from(selectedArray)
+        for (let selected of selectedArrayFixed ) {
+            for (let original of originalNodes ) {
+                if (original.id === selected.id) {
+                deleteElement(original);
+                selectedArray.splice(selectedArray.indexOf(selected), 1);
                 }
             }
         }
