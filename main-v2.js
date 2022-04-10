@@ -18,6 +18,7 @@ let select = document.querySelector(".select");
 let moveBtn = document.querySelector(".moveBtn");
 let deleteSelected = document.querySelector(".deleteSelected");
 let showDetails = document.querySelector(".showDetails");
+let selectAll = document.querySelector(".selectAll");
 
 // Header
 let head = document.createElement("h1");
@@ -39,6 +40,7 @@ select.style.cssText ="padding:5px; background-color:green; color:white; width:f
 moveBtn.style.cssText ="padding:5px; background-color:green; color:white; width:fit-content; border-radius:5px; cursor:pointer;";
 deleteSelected.style.cssText ="padding:5px; background-color:red; color:white; width:fit-content; border-radius:5px; visibility:hidden; cursor:pointer;";
 showDetails.style.cssText ="padding:5px; background-color:green; color:white; width:fit-content; border-radius:5px; visibility:hidden; cursor:pointer;";
+selectAll.style.cssText ="padding:5px; background-color:green; color:white; width:fit-content; border-radius:5px; visibility:hidden; cursor:pointer;";
 // count of Tasks css style
 count.style.cssText = "display:flex; justify-content:space-evenly;";
 tasksCount.style.cssText = "display:flex;";
@@ -86,30 +88,28 @@ let detailsSheet;
 restoreTasks();
 // Add a New Task
 add.addEventListener("click", function (e) {
-    if(select.textContent === "Select"){
-        if (input.value !== "") {
-            loadingFunc();
-            window.setTimeout((_) => {
-            idCount++;
-            let time = new Date();
-            let taskObj = {
-                [`ID-${idCount}`]: input.value,
-                status: "Pending",
-                timeRecord: time
-                .toString()
-                .match(/\w+ \d+ \d+ \d+:\d+:\d+/gi)
-                .join(""),
-            };
-            arrOfTasks.push(taskObj);
-            window.localStorage.setItem("ToDoList", JSON.stringify(arrOfTasks));
-            createEls();
-            task.setAttribute("id", `ID-${idCount}`);
-            let tasktxtNode = input.value;
-            task.prepend(tasktxtNode);
-            input.value = "";
-            loading.remove();
-            }, 500);
-        }
+    if (input.value !== "") {
+        loadingFunc();
+        window.setTimeout((_) => {
+        idCount++;
+        let time = new Date();
+        let taskObj = {
+            [`ID-${idCount}`]: input.value,
+            status: "Pending",
+            timeRecord: time
+            .toString()
+            .match(/\w+ \d+ \d+ \d+:\d+:\d+/gi)
+            .join(""),
+        };
+        arrOfTasks.push(taskObj);
+        window.localStorage.setItem("ToDoList", JSON.stringify(arrOfTasks));
+        createEls();
+        task.setAttribute("id", `ID-${idCount}`);
+        let tasktxtNode = input.value;
+        task.prepend(tasktxtNode);
+        input.value = "";
+        loading.remove();
+        }, 500);
     }
 });
 
@@ -182,13 +182,16 @@ document.addEventListener("click", function (e) {
             select.textContent = "Selecting";
             deleteSelected.style.visibility = "visible";
             showDetails.style.visibility = "visible";
+            selectAll.style.visibility = "visible";
             tasks.childNodes.forEach((el) => {
                 SelectCircle(el);
             });
-        } else if (select.textContent === "Selecting" && showDetails.innerHTML === "Details" && selectedArray.length === 0) {
+        } else if (select.textContent === "Selecting" && showDetails.innerHTML === "Details") {
+            deselectAll()
             select.textContent = "Select";
             deleteSelected.style.visibility = "hidden";
             showDetails.style.visibility = "hidden";
+            selectAll.style.visibility = "hidden";
             if (arrOfTasks && arrOfTasks.length > 0) {
                 for (task of tasks.childNodes) {
                 let selectedcircle = document.querySelector(`#${task.id} .circle`);
@@ -202,24 +205,9 @@ document.addEventListener("click", function (e) {
 // click on Select Circle
 document.addEventListener("click", function (e) {
     if (e.target.style.backgroundColor === "white" && e.target.className === "circle") {
-        e.target.style.backgroundColor = "green";
-        e.target.style.border = "none";
-        let selectedNode = e.target.parentNode;
-        for (let selected of selectedArray) {
-            if (selected.id === selectedNode.id) {
-                selectedArray.splice(selectedArray.indexOf(selected), 1);
-            }
-        }
-        selectedArray.push(selectedNode);
+        selectTarget(e.target)
     } else if (e.target.style.backgroundColor === "green" && e.target.className === "circle") {
-        e.target.style.backgroundColor = "white";
-        e.target.style.border = "1px solid black";
-        let deletedNode = e.target.parentNode;
-        for (let selected of selectedArray) {
-            if (selected.id === deletedNode.id) {
-                selectedArray.splice(selectedArray.indexOf(selected), 1);
-            }
-        }
+        deSelectTarget(e.target)
     }
 });
 
@@ -337,6 +325,21 @@ deleteAllBtn.addEventListener("click", function () {
     }
 });
 
+// Select and deselect All 
+selectAll.addEventListener("click", function(){
+    if(arrOfTasks.length > 0){
+        if(selectAll.textContent === "Select All"){
+            selectAll.textContent = "Deselect All"
+            selectAll.style.backgroundColor = "red"
+            selectAllFunc()
+        }else if(selectAll.textContent === "Deselect All"){
+            selectAll.textContent = "Select All"
+            selectAll.style.backgroundColor = "green"
+            deSelectAllFunc()
+        }
+    }
+})
+
 // Mark All Completed
 completeAllBtn.addEventListener("click", function () {
     if (arrOfTasks.length > 0) {
@@ -426,6 +429,9 @@ function createEls() {
     if (moveBtn.textContent === "Stop") {
         upAndDown(task);
     }
+    if (select.textContent === "Selecting") {
+        SelectCircle(task)
+    }
     task.append(completedBtn, editBtn, deleteBtn, detailsSheet);
     tasks.prepend(task);
     noOfTasks();
@@ -508,3 +514,48 @@ function SelectCircle(taskToSelect) {
         taskToSelect.append(selectCircle);
     }
 }
+
+function deselecting(deletedNode) {
+    for (let selected of selectedArray) {
+        if (selected.id === deletedNode.id) {
+            selectedArray.splice(selectedArray.indexOf(selected), 1);
+        }
+    }
+}
+
+function deselectAll(){
+    while(selectedArray.length){
+        selectedArray.pop()
+    }
+}
+
+function selectTarget(taskCircle){
+    taskCircle.style.backgroundColor = "green";
+    taskCircle.style.border = "none";
+    let selectedNode = taskCircle.parentNode;
+    deselecting(selectedNode)
+    selectedArray.push(selectedNode);
+}
+function deSelectTarget(taskCircle){
+    taskCircle.style.backgroundColor = "white";
+    taskCircle.style.border = "1px solid black";
+    let deletedNode = taskCircle.parentNode;
+    deselecting(deletedNode)
+}
+
+function selectAllFunc() {
+    for (task of tasks.childNodes) {
+        let taskCircle = document.querySelector(`#${task.id} .circle`);
+        selectTarget(taskCircle);
+    }
+}
+
+function deSelectAllFunc() {
+    for (task of tasks.childNodes) {
+        let taskCircle = document.querySelector(`#${task.id} .circle`);
+        deSelectTarget(taskCircle);
+    }
+}
+
+
+
