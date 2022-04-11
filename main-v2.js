@@ -84,6 +84,7 @@ let selectCircle;
 let loading;
 let selectedArray= [];
 let detailsSheet;
+let trueArr = []
 
 restoreTasks();
 
@@ -385,6 +386,7 @@ function restoreTasks() {
             }
             idCount = Math.max(...idNumsArr);
         }
+        checkAllCompleted()
     } else {
         arrOfTasks = [];
         idCount = 0;
@@ -583,3 +585,19 @@ function hideDetailsFunc(){
         }
     }
 }
+
+function checkAllCompleted(){
+    for(task of tasks.childNodes){
+        let taskStatus = task.firstElementChild.classList.contains("completed")
+        if(taskStatus){
+            trueArr.push(taskStatus)
+        }
+    }
+    if(trueArr.length === tasks.childNodes.length){
+        completeAllBtn.textContent = "Uncomplete All"
+        completeAllBtn.style.backgroundColor = "red"
+    }
+}
+
+
+
