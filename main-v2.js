@@ -86,6 +86,7 @@ let selectedArray= [];
 let detailsSheet;
 
 restoreTasks();
+
 // Add a New Task
 add.addEventListener("click", function (e) {
     if (input.value !== "") {
@@ -96,10 +97,7 @@ add.addEventListener("click", function (e) {
         let taskObj = {
             [`ID-${idCount}`]: input.value,
             status: "Pending",
-            timeRecord: time
-            .toString()
-            .match(/\w+ \d+ \d+ \d+:\d+:\d+/gi)
-            .join(""),
+            timeRecord: time.toString().match(/\w+ \d+ \d+ \d+:\d+:\d+/gi).join(""),
         };
         arrOfTasks.push(taskObj);
         window.localStorage.setItem("ToDoList", JSON.stringify(arrOfTasks));
@@ -186,12 +184,17 @@ document.addEventListener("click", function (e) {
             tasks.childNodes.forEach((el) => {
                 SelectCircle(el);
             });
-        } else if (select.textContent === "Selecting" && showDetails.innerHTML === "Details") {
+        } else if (select.textContent === "Selecting" ) {
             deselectAll()
+            hideDetailsFunc()
             select.textContent = "Select";
+            showDetails.textContent = "Details";
             deleteSelected.style.visibility = "hidden";
             showDetails.style.visibility = "hidden";
             selectAll.style.visibility = "hidden";
+            selectAll.textContent = "Select All"
+            selectAll.style.backgroundColor = "green"
+            showDetails.style.backgroundColor = "green"
             if (arrOfTasks && arrOfTasks.length > 0) {
                 for (task of tasks.childNodes) {
                 let selectedcircle = document.querySelector(`#${task.id} .circle`);
@@ -216,33 +219,11 @@ showDetails.addEventListener("click", function (e) {
     if (e.target.style.backgroundColor === "green" && selectedArray.length > 0) {
         e.target.style.backgroundColor = "red";
         e.target.innerHTML = "Displaying"
-        if (arrOfTasks && arrOfTasks.length > 0) {
-        for (let selected of selectedArray) {
-            for (let originalTask of tasks.childNodes) {
-            if (originalTask.id === selected.id) {
-                let selectedDetails = document.querySelector(
-                `#${originalTask.id} .details`
-                );
-                selectedDetails.style.visibility = "visible";
-                for (let task of arrOfTasks) {
-                if (task.hasOwnProperty(originalTask.id)) {
-                    let taskTime = task["timeRecord"];
-                    selectedDetails.innerText = `Task's ID : ${originalTask.id}\nTask Created at : ${taskTime}`;
-                }
-                }
-            }
-            }
-        }
-        }
+        showDetailsFunc()
     } else if (e.target.style.backgroundColor === "red") {
         e.target.style.backgroundColor = "green";
         e.target.innerHTML = "Details"
-        if (arrOfTasks && arrOfTasks.length > 0) {
-            for (task of tasks.childNodes) {
-                let selectedDetails = document.querySelector(`#${task.id} .details`);
-                selectedDetails.style.visibility = "hidden";
-            }
-        }
+        hideDetailsFunc()
     }
 });
 
@@ -342,23 +323,40 @@ selectAll.addEventListener("click", function(){
 
 // Mark All Completed
 completeAllBtn.addEventListener("click", function () {
-    if (arrOfTasks.length > 0) {
-        if (confirm("Complete All Tasks !!!!!!")) {
-        let arrTasks = Array.from(tasks.childNodes);
-        for (let task of arrTasks) {
-            task.firstElementChild.style.backgroundColor = "green";
-            task.firstElementChild.textContent = "Completed";
-            task.firstElementChild.classList.remove("pending");
-            task.firstElementChild.classList.add("completed");
-            noOfCompleted();
-            for (let oneTask of arrOfTasks) {
-                if (oneTask.hasOwnProperty(task.id)) {
-                    oneTask["status"] = "completed";
-                    window.localStorage.setItem("ToDoList", JSON.stringify(arrOfTasks));
+    if (arrOfTasks.length > 0 && completeAllBtn.textContent === "Complete All") {
+        completeAllBtn.textContent = "Uncomplete All"
+            completeAllBtn.style.backgroundColor = "red"
+            let arrTasks = Array.from(tasks.childNodes);
+            for (let task of arrTasks) {
+                task.firstElementChild.style.backgroundColor = "green";
+                task.firstElementChild.textContent = "Completed";
+                task.firstElementChild.classList.remove("pending");
+                task.firstElementChild.classList.add("completed");
+                noOfCompleted();
+                for (let oneTask of arrOfTasks) {
+                    if (oneTask.hasOwnProperty(task.id)) {
+                        oneTask["status"] = "completed";
+                        window.localStorage.setItem("ToDoList", JSON.stringify(arrOfTasks));
+                    }
                 }
             }
-        }
-        }
+    }else if(completeAllBtn.textContent === "Uncomplete All"){
+        completeAllBtn.textContent = "Complete All"
+        completeAllBtn.style.backgroundColor = "green"
+        let arrTasks = Array.from(tasks.childNodes);
+            for (let task of arrTasks) {
+                task.firstElementChild.style.backgroundColor = "grey";
+                task.firstElementChild.textContent = "Pending";
+                task.firstElementChild.classList.remove("completed");
+                task.firstElementChild.classList.add("pending");
+                noOfCompleted();
+                for (let oneTask of arrOfTasks) {
+                    if (oneTask.hasOwnProperty(task.id)) {
+                        oneTask["status"] = "pending";
+                        window.localStorage.setItem("ToDoList", JSON.stringify(arrOfTasks));
+                    }
+                }
+            }
     }
 });
 
@@ -558,4 +556,30 @@ function deSelectAllFunc() {
 }
 
 
+function showDetailsFunc(){
+    if (arrOfTasks && arrOfTasks.length > 0) {
+        for (let selected of selectedArray) {
+            for (let originalTask of tasks.childNodes) {
+                if (originalTask.id === selected.id) {
+                    let selectedDetails = document.querySelector(`#${originalTask.id} .details`);
+                    selectedDetails.style.visibility = "visible";
+                    for (let task of arrOfTasks) {
+                        if (task.hasOwnProperty(originalTask.id)) {
+                            let taskTime = task["timeRecord"];
+                            selectedDetails.innerText = `Task's ID : ${originalTask.id}\nTask Created at : ${taskTime}`;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
+function hideDetailsFunc(){
+    if(arrOfTasks.length > 0){
+        for (task of tasks.childNodes) {
+            let selectedDetails = document.querySelector(`#${task.id} .details`);
+            selectedDetails.style.visibility = "hidden";
+        }
+    }
+}
