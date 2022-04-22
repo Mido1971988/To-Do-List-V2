@@ -85,6 +85,11 @@ let loading;
 let selectedArray= [];
 let detailsSheet;
 let trueArr = []
+let firstSwap = {};
+let firstSwapIndex;
+let secondSwap = {};
+let secondSwapIndex;
+let swapCounter = 0;
 
 restoreTasks();
 
@@ -176,8 +181,9 @@ document.addEventListener("click", function (e) {
 
 // Click on Select Btn
 document.addEventListener("click", function (e) {
-    if (e.target.className === "select" && moveBtn.innerHTML === "Move") {
+    if (e.target.className === "select" && (moveBtn.innerHTML === "Move"|| "Swap") ) {
         if (select.textContent === "Select") {
+            moveBtn.textContent = "Swap";
             select.textContent = "Selecting";
             deleteSelected.style.visibility = "visible";
             showDetails.style.visibility = "visible";
@@ -186,6 +192,7 @@ document.addEventListener("click", function (e) {
                 SelectCircle(el);
             });
         } else if (select.textContent === "Selecting" ) {
+            moveBtn.textContent = "Move";
             deselectAll()
             hideDetailsFunc()
             select.textContent = "Select";
@@ -244,7 +251,7 @@ document.addEventListener("click", function (e) {
     }
 });
 
-// Click on Move Button
+// Click on Move or swap Button
 document.addEventListener("click", function (e) {
     if (e.target.className === "moveBtn" && select.textContent === "Select") {
         // Create arrow for up and down
@@ -266,6 +273,30 @@ document.addEventListener("click", function (e) {
                 }
             }
         }
+    }else if(e.target.className === "moveBtn" && select.textContent === "Selecting" && selectedArray.length === 2 ){
+        for(let swapEl of selectedArray){
+            for(task of arrOfTasks){
+                if(task[swapEl.id]){
+                    if(swapCounter === 0){
+                        Object.assign(firstSwap , task)
+                        firstSwapIndex = arrOfTasks.indexOf(task)
+                        swapCounter++
+                    }else if(swapCounter === 1){
+                        Object.assign(secondSwap , task)
+                        secondSwapIndex = arrOfTasks.indexOf(task)
+                        swapCounter = 0
+                    }
+                }
+            }
+        }
+        arrOfTasks[firstSwapIndex] = secondSwap
+        arrOfTasks[secondSwapIndex] = firstSwap
+        window.localStorage.setItem("ToDoList", JSON.stringify(arrOfTasks));
+        tasks.innerHTML = "";
+        deselectAll()
+        restoreTasks();
+        firstSwap = {}
+        secondSwap = {}
     }
 });
 
@@ -296,6 +327,8 @@ document.addEventListener("click", function (e) {
 deleteAllBtn.addEventListener("click", function () {
     if (arrOfTasks.length > 0) {
         if (confirm("Delete All Tasks !!!!!")) {
+            completeAllBtn.textContent = "Complete All"
+            completeAllBtn.style.backgroundColor = "green"
             tasks.innerHTML = "";
             noTaskToShow();
             window.localStorage.removeItem("ToDoList");
